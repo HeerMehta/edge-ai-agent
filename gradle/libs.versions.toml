@@ -8,7 +8,9 @@ lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
 kotlin = "2.4.0"
 composeBom = "2026.02.01"
-litertlm = "0.18.1"
+# ADK 1.4.0 only works with LiteRT-LM up to 0.14.0 (0.15+ removed methods its adapter calls).
+litertlm = "0.14.0"
+adk = "1.4.0"
 coroutines = "1.11.0"
 
 [libraries]
@@ -19,6 +21,8 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleRuntimeKtx" }
 litertlm-android = { group = "com.google.ai.edge.litertlm", name = "litertlm-android", version.ref = "litertlm" }
+adk-core = { group = "com.google.adk", name = "google-adk-kotlin-core", version.ref = "adk" }
+adk-litertlm = { group = "com.google.adk", name = "google-adk-kotlin-litertlm", version.ref = "adk" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }

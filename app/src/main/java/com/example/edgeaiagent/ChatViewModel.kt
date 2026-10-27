@@ -5,6 +5,7 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.edgeaiagent.adk.AdkAssistant
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,7 @@ data class ChatMessage(val fromUser: Boolean, val text: String)
 
 class ChatViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val assistant: Assistant = HelloAgent(app)
+    private val assistant: Assistant = AdkAssistant(app)
 
     private val _state = MutableStateFlow<UiState>(UiState.Loading)
     val state: StateFlow<UiState> = _state
@@ -67,7 +68,7 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
         _steps.value = emptyList()
         _messages.update { it + ChatMessage(true, text) }
 
-        // chat() blocks until the whole tool loop is finished, so it runs on the IO dispatcher
+        // chat() can block until the whole tool loop is finished, so it runs on the IO dispatcher
         viewModelScope.launch(Dispatchers.IO) {
             Log.i(TAG, "send: $text")
             val t0 = SystemClock.elapsedRealtime()
