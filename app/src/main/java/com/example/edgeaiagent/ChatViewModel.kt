@@ -5,7 +5,7 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.edgeaiagent.adk.AdkAssistant
+import com.example.edgeaiagent.tutor.TutorAssistant
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +25,7 @@ data class ChatMessage(val fromUser: Boolean, val text: String)
 
 class ChatViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val assistant: Assistant = AdkAssistant(app)
+    private val assistant: Assistant = TutorAssistant(app)
 
     private val _state = MutableStateFlow<UiState>(UiState.Loading)
     val state: StateFlow<UiState> = _state
