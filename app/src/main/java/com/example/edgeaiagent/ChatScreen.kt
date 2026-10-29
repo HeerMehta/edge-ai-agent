@@ -39,7 +39,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/** Colours for one theme. The user's bubbles use the same colourful gradient in both. */
 private class ChatColors    (
     val background: Color,
     val header: Color,
@@ -70,6 +69,8 @@ private val DarkColors = ChatColors(
 private val Indigo = Color(0xFF6366F1)
 private val UserGradient = Brush.horizontalGradient(listOf(Indigo, Color(0xFF8B5CF6)))
 
+// FILE INFO: The chat screen and its look: the header, the message bubbles,
+// the "Behind the scenes" steps card, and the input box with the send button
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
     val colors = if (isSystemInDarkTheme()) DarkColors else LightColors
@@ -81,14 +82,12 @@ fun ChatScreen(viewModel: ChatViewModel) {
     var input by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
-    // Keep the newest message (and the steps card under it) in view
     val itemCount = messages.size + if (steps.isEmpty()) 0 else 1
     LaunchedEffect(itemCount, steps.size) {
         if (itemCount > 0) listState.scrollToItem(itemCount - 1)
     }
 
     Column(Modifier.fillMaxSize().background(colors.background).imePadding()) {
-        // Header: name, then the status line (backend + init time) and the stats of the last reply
         Column(
             Modifier.fillMaxWidth().background(colors.header).statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 12.dp)
@@ -126,7 +125,6 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 item { Text("Say hi! Chat about anything, or ask me what time it is.", color = colors.noteText) }
             }
             items(messages) { Bubble(it, colors) }
-            // The tool loop, step by step, right under the conversation
             if (steps.isNotEmpty()) item { StepsCard(steps, colors) }
         }
 
@@ -169,11 +167,9 @@ fun ChatScreen(viewModel: ChatViewModel) {
     }
 }
 
-/** One chat bubble: the user's on the right (gradient), the friend's on the left. */
 @Composable
 private fun Bubble(message: ChatMessage, colors: ChatColors) {
     val fromUser = message.fromUser
-    // The corner next to the sender is squarer, like a speech bubble
     val shape = RoundedCornerShape(18.dp, 18.dp, if (fromUser) 4.dp else 18.dp, if (fromUser) 18.dp else 4.dp)
     Row(
         Modifier.fillMaxWidth(),
@@ -193,7 +189,8 @@ private fun Bubble(message: ChatMessage, colors: ChatColors) {
     }
 }
 
-/** Small muted card listing the model calls and tool calls of the last turn. */
+// POINT TO LOOK: Where onStep ends up: every step the assistant reports
+// (via ChatViewModel.addStep) is listed in this "Behind the scenes" card
 @Composable
 private fun StepsCard(steps: List<String>, colors: ChatColors) {
     Column(

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.edgeaiagent"
-        minSdk = 24
+        minSdk = 26 // ADK needs 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -31,6 +31,10 @@ android {
     buildFeatures {
         compose = true
     }
+    packaging {
+        // Several of ADK's Google libraries ship the same metadata files
+        resources.excludes += setOf("META-INF/INDEX.LIST", "META-INF/DEPENDENCIES")
+    }
 }
 
 dependencies {
@@ -46,6 +50,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     // On-device LLM runtime, pinned to an exact version
     implementation(libs.litertlm.android)
+    // Google's Agent Development Kit, plus its adapter that runs agents on LiteRT-LM
+    implementation(libs.adk.core)
+    implementation(libs.adk.litertlm)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
