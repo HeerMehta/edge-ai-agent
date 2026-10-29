@@ -1,8 +1,12 @@
 package com.example.edgeaiagent.tutor
 
+// POINT TO LOOK: How many questions make one quiz
 const val QUIZ_LENGTH = 5
 
+// FILE INFO: One quiz question with its level (1 easy to 3 hard) and the reference answer
 data class Question(val id: Int, val level: Int, val question: String, val answer: String) {
+    // GUARDRAIL: Code checks the answer first: an exact match with the reference is always correct.
+    // Commas separate alternative answers, unless the answer is a whole sentence
     fun accepts(reply: String): Boolean {
         val options = if (answer.endsWith(".")) listOf(answer) else answer.split(",")
         return options.any { normalize(it) == normalize(reply) }
@@ -12,6 +16,7 @@ data class Question(val id: Int, val level: Int, val question: String, val answe
         s.lowercase().replace('’', '\'').replace(Regex("[^a-z' ]"), " ").trim().split(Regex("\\s+")).joinToString(" ")
 }
 
+// POINT TO LOOK: The question bank; add questions here, or more alternative answers
 val QUESTION_BANK = listOf(
     Question(1, 1, "Fix the sentence: 'She go to school every day.'", "She goes to school every day."),
     Question(2, 1, "Give a synonym for 'happy'.", "glad, joyful, cheerful"),

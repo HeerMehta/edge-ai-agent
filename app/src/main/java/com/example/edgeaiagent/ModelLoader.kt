@@ -12,6 +12,9 @@ const val FORCE_CPU = false
 
 const val MODEL_FILE_NAME = "gemma-4-E2B-it.litertlm"
 
+// FILE INFO: Loads the model. loadEngine finds the model file in the app's data folder
+// and calls createEngine to build the engine that runs it.
+// It tries the GPU first and falls back to the CPU (that is the "GPU"/"CPU" in the header)
 fun loadEngine(context: Context): Pair<Engine, String> {
     val modelFile = File(context.getExternalFilesDir(null), MODEL_FILE_NAME)
     if (!modelFile.exists()) {

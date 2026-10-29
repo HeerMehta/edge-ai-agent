@@ -5,6 +5,8 @@ import com.google.adk.kt.events.Event
 import com.google.adk.kt.plugins.Plugin
 import com.google.adk.kt.types.Role
 
+// LOGGING: An ADK plugin that sees every event, also inside the grader and quizmaster,
+// and reports each one as a step in the "Behind the scenes" card
 class StepReporter : Plugin {
     override val name = "step_reporter"
 
@@ -25,6 +27,7 @@ class StepReporter : Plugin {
         return event
     }
 
+    // LOGGING: Each new message starts a new list of steps
     fun reset(onStep: (String) -> Unit) {
         this.onStep = onStep
         lastAuthor = ""

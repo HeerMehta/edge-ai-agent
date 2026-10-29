@@ -7,10 +7,15 @@ import com.google.adk.kt.types.FunctionCall
 import com.google.adk.kt.types.Part
 import com.google.adk.kt.types.Role
 
+// GUARDRAIL: Patterns that find the verdict and tip in the model's text
 private val VERDICT = Regex("""verdict\s*[:=]\s*["']?(correct|partly|wrong)""", RegexOption.IGNORE_CASE)
 private val TIP = Regex("""tip\s*[:=]\s*(?:"([^"]*)"|([^\n]+))""", RegexOption.IGNORE_CASE)
 
+// GUARDRAIL: Safety nets for save_analysis, the one tool the model must write arguments for.
+// Both turn the model's mistake back into a proper tool call
 class GraderRescue(private val log: TutorLog, private val report: (String) -> Unit) {
+    // GUARDRAIL: The model wrote the call in a form the engine cannot read, so the call failed.
+    // The error still holds what the model wrote, so rebuild the call from it
     fun onModelError(error: Throwable): CallbackChoice<Unit, LlmResponse> {
         val message = error.message.orEmpty()
         if ("save_analysis" !in message) return CallbackChoice.Continue(Unit)
@@ -20,6 +25,7 @@ class GraderRescue(private val log: TutorLog, private val report: (String) -> Un
         return CallbackChoice.Break(saveCall(verdict, tip))
     }
 
+    // GUARDRAIL: The model wrote its verdict as text instead of calling the tool; make the call for it
     fun afterModel(response: LlmResponse): LlmResponse {
         if (response.partial || log.pending() == null) return response
         if (response.content?.parts.orEmpty().any { it.functionCall != null }) return response

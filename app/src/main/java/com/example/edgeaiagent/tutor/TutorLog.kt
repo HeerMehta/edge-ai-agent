@@ -3,12 +3,16 @@ package com.example.edgeaiagent.tutor
 import org.json.JSONObject
 import java.io.File
 
+// AI MEMORY: One graded answer, as saved in the file
 data class Analysis(val num: Int, val id: Int, val level: Int, val question: String, val verdict: String, val tip: String)
 
+// FILE INFO: The quiz's memory, kept in two small files instead of the chat history.
+// analysis.jsonl has one line per graded answer, pending.json the question waiting for an answer
 class TutorLog(private val dir: File) {
     private val analysisFile = File(dir, "analysis.jsonl")
     private val pendingFile = File(dir, "pending.json")
 
+    // AI MEMORY: Starts a fresh quiz by deleting both files
     fun clear() {
         dir.mkdirs()
         analysisFile.delete()
@@ -32,6 +36,7 @@ class TutorLog(private val dir: File) {
 
     fun lastAnalysis(): Analysis? = analyses().lastOrNull()
 
+    // AI MEMORY: The question waiting for an answer, or null if there is none
     fun pending(): Question? {
         if (!pendingFile.exists()) return null
         val o = JSONObject(pendingFile.readText())

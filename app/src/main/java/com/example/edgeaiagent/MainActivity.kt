@@ -9,6 +9,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.example.edgeaiagent.ui.theme.EdgeAIAgentTheme
 
+// FILE INFO: The main activity, the app's first and only screen.
+// It just shows the chat: see ChatScreen(viewModel) in setContent below
 class MainActivity : ComponentActivity() {
     private val viewModel: ChatViewModel by viewModels()
 

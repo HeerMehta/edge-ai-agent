@@ -5,7 +5,8 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.edgeaiagent.tutor.TutorAssistant
+//import com.example.edgeaiagent.tutor.TutorAssistant //Stage 3
+//import com.example.edgeaiagent.adk.AdkAssistant // Stage 2
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +23,13 @@ sealed interface UiState {
 
 data class ChatMessage(val fromUser: Boolean, val text: String)
 
+// FILE INFO: The link between the chat screen and the assistant.
+// It holds the messages and steps the screen shows, sends each user
+// message to the assistant, and adds the reply to the chat
 class ChatViewModel(app: Application) : AndroidViewModel(app) {
-    private val assistant: Assistant = TutorAssistant(app)
+    // POINT TO LOOK: The one line that picks which AI assistant the app runs
+    // Let us start with EchoAssistant first
+    private val assistant: Assistant = EchoAssistant()
 
     private val _state = MutableStateFlow<UiState>(UiState.Loading)
     val state: StateFlow<UiState> = _state
@@ -84,6 +90,8 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    // POINT TO LOOK: This is the onStep the assistant gets in chat(): each step is
+    // logged to Logcat and shown in the "Behind the scenes" card (StepsCard in ChatScreen.kt)
     private fun addStep(line: String) {
         Log.i(TAG, line)
         _steps.update { it + line }

@@ -69,6 +69,8 @@ private val DarkColors = ChatColors(
 private val Indigo = Color(0xFF6366F1)
 private val UserGradient = Brush.horizontalGradient(listOf(Indigo, Color(0xFF8B5CF6)))
 
+// FILE INFO: The chat screen and its look: the header, the message bubbles,
+// the "Behind the scenes" steps card, and the input box with the send button
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
     val colors = if (isSystemInDarkTheme()) DarkColors else LightColors
@@ -187,6 +189,8 @@ private fun Bubble(message: ChatMessage, colors: ChatColors) {
     }
 }
 
+// POINT TO LOOK: Where onStep ends up: every step the assistant reports
+// (via ChatViewModel.addStep) is listed in this "Behind the scenes" card
 @Composable
 private fun StepsCard(steps: List<String>, colors: ChatColors) {
     Column(
