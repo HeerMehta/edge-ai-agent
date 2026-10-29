@@ -8,18 +8,11 @@ import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
 import java.io.File
 
-// WORKSHOP: set true if GPU misbehaves
 const val FORCE_CPU = false
 
 const val MODEL_FILE_NAME = "gemma-4-E2B-it.litertlm"
 
-/**
- * Loads the model for the ADK assistant. Blocking and slow (~10 s),
- * so call it from a background dispatcher. Tries the GPU first and falls back to the CPU.
- * Returns the engine and the name of the backend that ended up active ("GPU" or "CPU").
- */
 fun loadEngine(context: Context): Pair<Engine, String> {
-    // The model lives in the app's external files dir; this call also creates that folder
     val modelFile = File(context.getExternalFilesDir(null), MODEL_FILE_NAME)
     if (!modelFile.exists()) {
         Log.w(TAG, "Model file missing: $modelFile")
@@ -35,11 +28,9 @@ fun loadEngine(context: Context): Pair<Engine, String> {
             Log.w(TAG, "GPU init failed, falling back to CPU", e)
         }
     }
-    // GPU failed (or was skipped): build a brand-new Engine on the CPU
     return createEngine(context, modelFile, Backend.CPU(), "CPU") to "CPU"
 }
 
-/** Builds an Engine for one backend and initializes it; closes it again if that throws. */
 private fun createEngine(context: Context, modelFile: File, backend: Backend, label: String): Engine {
     Log.i(TAG, "init start ($label)")
     val t0 = SystemClock.elapsedRealtime()

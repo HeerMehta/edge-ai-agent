@@ -20,20 +20,13 @@ private const val APP_NAME = "buddy"
 private const val USER_ID = "user"
 private const val SESSION_ID = "chat"
 
-// Hard cap on model calls per user message (a normal tool turn uses 2)
 private const val MAX_STEPS = 3
 
-/**
- * The same on-device model, but ADK runs the agent loop for us:
- * it calls the model, runs the tools it asks for, and sends the results back until there is an answer.
- */
 class AdkAssistant(private val context: Context) : Assistant {
-
     private var engine: Engine? = null
     private var model: LiteRtLmModel? = null
     private var runner: InMemoryRunner? = null
 
-    /** Loads the model and builds the agent. Returns the backend in use ("GPU" or "CPU"). */
     override suspend fun start(): String {
         val (eng, backendName) = loadEngine(context)
         val llm = LiteRtLmModel.create(eng)
@@ -46,7 +39,6 @@ class AdkAssistant(private val context: Context) : Assistant {
             maxSteps = MAX_STEPS,
         )
         val r = InMemoryRunner(agent = agent, appName = APP_NAME)
-        // ONE session for the whole app run: ADK keeps the chat history in it
         r.sessionService.createSession(SessionKey(APP_NAME, USER_ID, SESSION_ID))
 
         engine = eng
@@ -61,7 +53,6 @@ class AdkAssistant(private val context: Context) : Assistant {
         onStep("model: thinking…")
 
         var answer = ""
-        // ADK reports every step of its loop as an Event: tool calls, tool results, then the final answer
         r.runAsync(userId = USER_ID, sessionId = SESSION_ID, newMessage = Content.fromText(Role.USER, text))
             .collect { event ->
                 event.functionCalls().forEach { onStep("tool call: ${it.name}(${it.args})") }
@@ -74,7 +65,7 @@ class AdkAssistant(private val context: Context) : Assistant {
 
     override fun close() {
         runner?.close()
-        model?.close() // closes the conversation; the engine is ours to close
+        model?.close()
         engine?.close()
         runner = null
         model = null

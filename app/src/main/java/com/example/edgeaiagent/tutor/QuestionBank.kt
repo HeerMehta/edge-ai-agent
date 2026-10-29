@@ -1,15 +1,8 @@
 package com.example.edgeaiagent.tutor
 
-// WORKSHOP: students edit this
 const val QUIZ_LENGTH = 5
 
-/** One quiz item. [level] runs from 1 (easy) to 3 (hard); [answer] is the reference the grader compares against. */
 data class Question(val id: Int, val level: Int, val question: String, val answer: String) {
-
-    /**
-     * True when [reply] is exactly a reference answer, ignoring case, punctuation and spaces.
-     * A sentence answer (ends with '.') is one answer; otherwise the commas separate alternatives.
-     */
     fun accepts(reply: String): Boolean {
         val options = if (answer.endsWith(".")) listOf(answer) else answer.split(",")
         return options.any { normalize(it) == normalize(reply) }
@@ -19,7 +12,6 @@ data class Question(val id: Int, val level: Int, val question: String, val answe
         s.lowercase().replace('’', '\'').replace(Regex("[^a-z' ]"), " ").trim().split(Regex("\\s+")).joinToString(" ")
 }
 
-// WORKSHOP: students edit this
 val QUESTION_BANK = listOf(
     Question(1, 1, "Fix the sentence: 'She go to school every day.'", "She goes to school every day."),
     Question(2, 1, "Give a synonym for 'happy'.", "glad, joyful, cheerful"),

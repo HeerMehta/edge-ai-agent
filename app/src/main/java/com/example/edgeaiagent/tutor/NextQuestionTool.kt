@@ -6,13 +6,8 @@ import com.google.adk.kt.types.FunctionDeclaration
 import com.google.adk.kt.types.Schema
 import com.google.adk.kt.types.Type
 
-/**
- * The quizmaster's tool. No arguments: it reads the last analysis from the file and
- * picks the next question itself (easier after a wrong answer, harder after a correct one).
- */
 class NextQuestionTool(private val log: TutorLog) :
     BaseTool(name = "next_question", description = "Get the next quiz question to ask the student") {
-
     override fun declaration() = FunctionDeclaration(
         name = name,
         description = description,
@@ -24,7 +19,6 @@ class NextQuestionTool(private val log: TutorLog) :
         if (answered.size >= QUIZ_LENGTH) return mapOf("done" to true, "answered" to answered.size)
 
         val last = answered.lastOrNull()
-        // A question is still waiting: ask it again instead of skipping it
         log.pending()?.let { return questionResult(it, answered.size + 1, last, repeated = true) }
 
         val level = when (last?.verdict) {
@@ -41,7 +35,6 @@ class NextQuestionTool(private val log: TutorLog) :
         return questionResult(question, answered.size + 1, last, repeated = false)
     }
 
-    /** What the model sees: the question to ask and how the last answer went. Never the answer key. */
     private fun questionResult(q: Question, number: Int, last: Analysis?, repeated: Boolean) = mapOf(
         "number" to number,
         "level" to q.level,

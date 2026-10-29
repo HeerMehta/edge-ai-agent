@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/** What the screen shows about the model. */
 sealed interface UiState {
     data object Loading : UiState
     data class Ready(val backend: String, val initMs: Long) : UiState
@@ -24,7 +23,6 @@ sealed interface UiState {
 data class ChatMessage(val fromUser: Boolean, val text: String)
 
 class ChatViewModel(app: Application) : AndroidViewModel(app) {
-
     private val assistant: Assistant = TutorAssistant(app)
 
     private val _state = MutableStateFlow<UiState>(UiState.Loading)
@@ -36,16 +34,13 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
     private val _generating = MutableStateFlow(false)
     val generating: StateFlow<Boolean> = _generating
 
-    /** Every step of the current tool loop (model calls, tool calls, results), shown in the status area. */
     private val _steps = MutableStateFlow<List<String>>(emptyList())
     val steps: StateFlow<List<String>> = _steps
 
-    /** Timing line for the last reply: total time and chars. */
     private val _replyStats = MutableStateFlow("")
     val replyStats: StateFlow<String> = _replyStats
 
     init {
-        // Loading is slow, so it runs once, off the main thread
         viewModelScope.launch(Dispatchers.Default) {
             val t0 = SystemClock.elapsedRealtime()
             try {
@@ -68,18 +63,15 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
         _steps.value = emptyList()
         _messages.update { it + ChatMessage(true, text) }
 
-        // chat() can block until the whole tool loop is finished, so it runs on the IO dispatcher
         viewModelScope.launch(Dispatchers.IO) {
             Log.i(TAG, "send: $text")
             val t0 = SystemClock.elapsedRealtime()
             val answer = try {
                 assistant.chat(text, ::addStep)
             } catch (e: CancellationException) {
-                throw e // CancellationException is an IllegalStateException; don't swallow it
+                throw e
             } catch (e: Exception) {
-                // Anything can go wrong while the model works: stop and show a plain message
                 Log.e(TAG, "error", e)
-                // The native error can be a long multi-line dump: show one short line, the full text is in Logcat
                 val reason = e.message?.lineSequence()?.firstOrNull().orEmpty().take(120)
                 addStep("error: ${e::class.simpleName}: $reason")
                 "Sorry, something went wrong (${e::class.simpleName}): $reason"
@@ -92,7 +84,6 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Called from the tool loop: log the step and show it on screen. */
     private fun addStep(line: String) {
         Log.i(TAG, line)
         _steps.update { it + line }
